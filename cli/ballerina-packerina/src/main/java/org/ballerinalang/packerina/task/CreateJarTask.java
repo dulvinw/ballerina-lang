@@ -43,25 +43,25 @@ public class CreateJarTask implements Task {
 
     private boolean dumpBir;
     private boolean buildNative;
-    private boolean dumpLlvmIr;
-    private boolean noOptimizeLlvm;
+    private boolean dumpLLVMIR;
+    private boolean noOptimizeLLVM;
 
     private boolean skipCopyLibsFromDist = false;
 
-    public CreateJarTask(boolean dumpBir, boolean buildNative, boolean dumpLlvmIr, boolean noOptimizeLlvm) {
+    public CreateJarTask(boolean dumpBir, boolean buildNative, boolean dumpLLVMIR, boolean noOptimizeLLVM) {
         this.dumpBir = dumpBir;
         this.buildNative = buildNative;
-        this.dumpLlvmIr = dumpLlvmIr;
-        this.noOptimizeLlvm = noOptimizeLlvm;
+        this.dumpLLVMIR = dumpLLVMIR;
+        this.noOptimizeLLVM = noOptimizeLLVM;
     }
 
-    public CreateJarTask(boolean dumpBir, boolean skipCopyLibsFromDist, boolean buildNative, boolean dumpLlvmIr,
-            boolean noOptimizeLlvm) {
+    public CreateJarTask(boolean dumpBir, boolean skipCopyLibsFromDist, boolean buildNative, boolean dumpLLVMIR,
+            boolean noOptimizeLLVM) {
         this.dumpBir = dumpBir;
         this.skipCopyLibsFromDist = skipCopyLibsFromDist;
         this.buildNative = buildNative;
-        this.dumpLlvmIr = dumpLlvmIr;
-        this.noOptimizeLlvm = noOptimizeLlvm;
+        this.dumpLLVMIR = dumpLLVMIR;
+        this.noOptimizeLLVM = noOptimizeLLVM;
     }
     
     @Override
@@ -91,7 +91,7 @@ public class CreateJarTask implements Task {
             Path jarOutput = buildContext.getJarPathFromTargetCache(module.packageID);
             if (!Files.exists(jarOutput)) {
                 if (buildNative) {
-                    BootstrapRunner.genNativeCode(entryBir.toString(), this.dumpLlvmIr, this.noOptimizeLlvm);
+                    BootstrapRunner.genNativeCode(entryBir.toString(), this.dumpLLVMIR, this.noOptimizeLLVM);
                 } else {
                     BootstrapRunner
                             .loadTargetAndGenerateJarBinary(entryBir.toString(), jarOutput.toString(), this.dumpBir,

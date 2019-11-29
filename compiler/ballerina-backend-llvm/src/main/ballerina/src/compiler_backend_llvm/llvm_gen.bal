@@ -18,10 +18,10 @@ import ballerina/llvm;
 import ballerina/bir;
 
 // TODO: make non-global
-llvm:LLVMValueRef? printfRef = ();
+llvm:LLVMValueRef printfRef = {};
 map<llvm:LLVMTypeRef> structMap = {"null" : llvm:llvmVoidType()};
 map<llvm:LLVMTypeRef> taggedTypeToTypePointerMap = {};
-map<int> precedenceMap = { "null":0, "boolean":1, "int":2};
+map<int> precedenceMap = { "null":0, "boolean":1, "int":2 };
 const int TAGGED_UNION_FLAG_INDEX = 0;
 const int TAGGED_UNION_VALUE_INDEX = 1;
 

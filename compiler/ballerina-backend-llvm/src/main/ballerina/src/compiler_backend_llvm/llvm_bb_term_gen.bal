@@ -75,10 +75,8 @@ type BbTermGenrator object {
         var printLnIntPatten = llvm:llvmBuildGlobalStringPtr(self.builder, printfPatten, "");
         llvm:LLVMValueRef[] printArgs = [printLnIntPatten];
         appendAllTo(printArgs, args);
-        if (printfRef is llvm:LLVMValueRef) {
-            llvm:LLVMValueRef callReturn = llvm:llvmBuildCall(self.builder, <llvm:LLVMValueRef>printfRef, printArgs,
-                        printArgs.length(), "");
-        }
+        llvm:LLVMValueRef callReturn = llvm:llvmBuildCall(self.builder, <llvm:LLVMValueRef>printfRef, printArgs,
+                    printArgs.length(), "");
     }
 
     function genCallToSamePkgFunc(map<FuncGenrator> funcGenrators, bir:Call callIns, llvm:LLVMValueRef[] args) {

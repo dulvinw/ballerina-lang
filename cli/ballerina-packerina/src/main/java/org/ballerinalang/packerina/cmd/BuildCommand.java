@@ -145,7 +145,7 @@ public class BuildCommand implements BLauncherCmd {
     private boolean dumpLLVMIR;
 
     @CommandLine.Option(names = "--no-optimize-llvm", hidden = true)
-    private boolean noOptimizeLlvm;
+    private boolean noOptimizeLLVM;
 
     @CommandLine.Option(names = {"--help", "-h"}, hidden = true)
     private boolean helpFlag;
@@ -374,7 +374,7 @@ public class BuildCommand implements BLauncherCmd {
                 .addTask(new CopyNativeLibTask(skipCopyLibsFromDist))    // copy the native libs(projects only)
                 // create the jar.
                 .addTask(new CreateJarTask(this.dumpBIR, skipCopyLibsFromDist, this.nativeBinary, this.dumpLLVMIR,
-                        this.noOptimizeLlvm))
+                        this.noOptimizeLLVM))
                 .addTask(new CopyModuleJarTask(skipCopyLibsFromDist))
                 .addTask(new RunTestsTask(), this.skipTests || isSingleFileBuild) // run tests
                                                                                                 // (projects only)

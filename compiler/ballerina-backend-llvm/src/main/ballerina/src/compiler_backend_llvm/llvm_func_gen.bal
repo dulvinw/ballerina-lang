@@ -19,12 +19,12 @@ import ballerina/bir;
 
 type FuncGenrator object {
     bir:Function func;
-    llvm:LLVMValueRef? funcRef = ();
     llvm:LLVMModuleRef mod;
-    map<llvm:LLVMValueRef>? localVarRefs = {};
-    map<llvm:LLVMTypeRef> localVarTypeRefs = {};
-    llvm:LLVMValueRef? varAllocBB = ();
     llvm:LLVMBuilderRef builder;
+    llvm:LLVMValueRef funcRef = {};
+    map<llvm:LLVMValueRef> localVarRefs = {};
+    map<llvm:LLVMTypeRef> localVarTypeRefs = {};
+    llvm:LLVMValueRef varAllocBB = {};
 
     function __init(bir:Function func, llvm:LLVMModuleRef mod, llvm:LLVMBuilderRef builder) {
         self.func = func;
@@ -63,6 +63,7 @@ type FuncGenrator object {
         }
         return argTypes;
     }
+
     function genFunctionBody(map<FuncGenrator> funcGenrators) {
         self.genLocalVarAllocationBbBody();
         var bbTermGenrators = self.genBbBodies();
@@ -81,31 +82,22 @@ type FuncGenrator object {
             self.cacheLocVarValue(localVar, localVarRef);
             self.cacheLocVarType(localVar, varType);
             if (self.isParameter(localVar)) {
-                llvm:LLVMValueRef? funcTemp = self.funcRef;
-                if (funcTemp is llvm:LLVMValueRef) {
-                    var parmRef = llvm:llvmGetParam(funcTemp, paramIndex);
-                    var loaded = llvm:llvmBuildStore(self.builder, parmRef, localVarRef);
-                    paramIndex += 1;
-                }
+                var parmRef = llvm:llvmGetParam(self.funcRef, paramIndex);
+                var loaded = llvm:llvmBuildStore(self.builder, parmRef, localVarRef);
+                paramIndex += 1;
             }
         }
         createTypePointerForTaggedStructType(self.builder);
     }
 
     function cacheLocVarValue(bir:VariableDcl? localVar, llvm:LLVMValueRef localVarRef) {
-        map<llvm:LLVMValueRef>? localVarRefsTemp = self.localVarRefs;
-        if (localVarRefsTemp is map<llvm:LLVMValueRef>) {
-            string localVarRefName = localVariableName(localVar);
-            localVarRefsTemp[localVarRefName] = localVarRef;
-        }
+        string localVarRefName = localVariableName(localVar);
+        self.localVarRefs[localVarRefName] = localVarRef;
     }
 
     function cacheLocVarType(bir:VariableDcl? localVar, llvm:LLVMTypeRef localVarTypeRef) {
-        map<llvm:LLVMValueRef>? localVarTypeRefsTemp = self.localVarTypeRefs;
-        if (localVarTypeRefsTemp is map<llvm:LLVMTypeRef>) {
-            string localVarRefName = localVariableName(localVar);
-            localVarTypeRefsTemp[localVarRefName] = localVarTypeRef;
-        }
+        string localVarRefName = localVariableName(localVar);
+        self.localVarTypeRefs[localVarRefName] = localVarTypeRef;
     }
 
     function isParameter(bir:VariableDcl? localVar) returns boolean {
@@ -130,10 +122,8 @@ type FuncGenrator object {
 
 
     function genLocalVarAllocationBBTerminator(map<BbTermGenrator> bbTermGenrators) {
-        if (self.varAllocBB is llvm:LLVMValueRef) {
-            llvm:llvmPositionBuilderAtEnd(self.builder, <llvm:LLVMValueRef> self.varAllocBB);
-        }
-        var brInsRef = llvm:llvmBuildBr(self.builder, findBbRefById(bbTermGenrators, "bb0"));
+        llvm:llvmPositionBuilderAtEnd(self.builder, <llvm:LLVMValueRef> self.varAllocBB);
+        _ = llvm:llvmBuildBr(self.builder, findBbRefById(bbTermGenrators, "bb0"));
     }
 
     function genBbTerminators(map<FuncGenrator> funcGenrators, map<BbTermGenrator> bbTermGenrators) {
@@ -167,10 +157,7 @@ type FuncGenrator object {
 
     function storeValueRefForLocalVarRef(llvm:LLVMValueRef valueRef, bir:VarRef variable) {
         string id = localVariableName(variable);
-        map<llvm:LLVMValueRef>? localVarRefsTemp = self.localVarRefs;
-        if (localVarRefsTemp is map<llvm:LLVMValueRef>) {
-            localVarRefsTemp[id] = valueRef;
-        }   
+        self.localVarRefs[id] = valueRef;
     }
 
     function getLocalVarTypeRefById(string id) returns llvm:LLVMTypeRef {
@@ -185,13 +172,9 @@ type FuncGenrator object {
     }
 
     function genBbDecl(string name) returns llvm:LLVMValueRef {
-        llvm:LLVMValueRef? funcRefTemp = self.funcRef;
-        if !(funcRefTemp is ()) {
-            var bbRef = llvm:llvmAppendBasicBlock(funcRefTemp, name);
-            llvm:llvmPositionBuilderAtEnd(self.builder, bbRef);
-            return bbRef;
-        }
-        panic error( "Found null variable : ");
+        var bbRef = llvm:llvmAppendBasicBlock(self.funcRef, name);
+        llvm:llvmPositionBuilderAtEnd(self.builder, bbRef);
+        return bbRef;
     }
 
     function isVoidFunc() returns boolean {

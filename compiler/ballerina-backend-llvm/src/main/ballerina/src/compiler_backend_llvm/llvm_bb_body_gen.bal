@@ -14,11 +14,6 @@ type BbBodyGenrator object {
     }
 
     function genBasicBlockBody() returns BbTermGenrator {
-        if (self.parent.funcRef is ()) {
-            error funcRefErr =  error("funcRefIsNullError", message = "funcref doesnt exist in" +
-                self.parent.func.name.value);
-            panic funcRefErr;
-        }
         llvm:LLVMBasicBlockRef bbRef = llvm:llvmAppendBasicBlock(<llvm:LLVMValueRef>self.parent.funcRef, self.bb.id.value);
         llvm:llvmPositionBuilderAtEnd(self.builder, bbRef);
         foreach var i in self.bb.instructions {
@@ -119,7 +114,7 @@ type BbBodyGenrator object {
         llvm:LLVMValueRef lhsRef = self.parent.getLocalVarRef(moveIns.lhsOp);
         var rhsVarOp = moveIns.rhsOp;
         llvm:LLVMValueRef rhsVarOpRef = self.parent.genLoadLocalToTempVar(rhsVarOp);
-        var loaded = <llvm:LLVMValueRef> llvm:llvmBuildStore(self.builder, rhsVarOpRef, lhsRef);
+        var loaded = llvm:llvmBuildStore(self.builder, rhsVarOpRef, lhsRef);
     }
 
     function castLhsOpForMoveIns (bir:Move moveIns) {
@@ -131,7 +126,7 @@ type BbBodyGenrator object {
 };
 
 function findBbRefById(map<BbTermGenrator> bbGenrators, string id) returns llvm:LLVMBasicBlockRef {
-    if !(bbGenrators[id] is BbTermGenrator) {
+    if !(bbGenrators.hasKey(id)) {
         error err = error("NotBbTermGenratorError", message = "bb '" + id + "' doesn't exist");
         panic err;
     }
@@ -140,16 +135,12 @@ function findBbRefById(map<BbTermGenrator> bbGenrators, string id) returns llvm:
 }
 
 function findFuncRefByName(map<FuncGenrator> funcGenrators, bir:Name name) returns llvm:LLVMValueRef {
-    if !(funcGenrators[name.value] is FuncGenrator) {
+    if !(funcGenrators.hasKey(name.value)) {
         error err = error("NotFuncGenratorTypeError", message = "function '" + name.value + "' doesn't exist");
         panic err;
     }
     FuncGenrator genrator = <FuncGenrator> funcGenrators[name.value];
-    if (genrator.funcRef is ()) {
-        error err = error("FuncRefIsNull", message = "function genrator doesn't have funcion reference");
-        panic err;
-    }
-    return <llvm:LLVMValueRef>genrator.funcRef;
+    return genrator.funcRef;
 }
 
 
