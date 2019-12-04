@@ -1203,3 +1203,4 @@ public function llvmPassManagerBuilderPopulateModulePassManager(LLVMPassManagerB
 //public function llvmAddLoopVectorizePass(LLVMPassManagerRef pm) = external;
 //public function llvmAddSLPVectorizePass(LLVMPassManagerRef pm) = external;
 public function llvmCheckIfTypesMatch(LLVMTypeRef castType, LLVMTypeRef lhsType) returns boolean = external;
+public function testFunc(int value) = external;

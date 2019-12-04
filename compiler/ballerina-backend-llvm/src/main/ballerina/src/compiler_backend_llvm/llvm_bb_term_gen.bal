@@ -47,6 +47,8 @@ type BbTermGenrator object {
             self.genCallToPrintf(args, "");
         } else if (callIns.name.value == "println"){
             self.genCallToPrintf(args, "\n");
+        } else if (callIns.name.value == "testFunc") {
+            self.genCallToTestFunc(args);
         } else {
             self.genCallToSamePkgFunc(funcGenrators, callIns, args);
         }
@@ -78,6 +80,13 @@ type BbTermGenrator object {
         if (printfRef is llvm:LLVMValueRef) {
             llvm:LLVMValueRef callReturn = llvm:llvmBuildCall(self.builder, <llvm:LLVMValueRef>printfRef, printArgs,
                         printArgs.length(), "");
+        }
+    }
+
+    function genCallToTestFunc(llvm:LLVMValueRef[] args) {
+        if (testFuncRef is llvm:LLVMValueRef) {
+            llvm:LLVMValueRef callReturn = llvm:llvmBuildCall(self.builder, <llvm:LLVMValueRef>testFuncRef, args,
+                        args.length(), "");
         }
     }
 

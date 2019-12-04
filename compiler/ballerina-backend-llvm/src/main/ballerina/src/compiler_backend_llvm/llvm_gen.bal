@@ -19,6 +19,7 @@ import ballerina/bir;
 
 // TODO: make non-global
 llvm:LLVMValueRef? printfRef = ();
+llvm:LLVMValueRef? testFuncRef = ();
 map<llvm:LLVMTypeRef> structMap = {"null" : llvm:llvmVoidType()};
 map<llvm:LLVMTypeRef> taggedTypeToTypePointerMap = {};
 map<int> precedenceMap = { "null":0, "boolean":1, "int":2};
@@ -46,6 +47,7 @@ function genFunctions(llvm:LLVMModuleRef mod, bir:Function?[] funcs) {
     var builder = llvm:llvmCreateBuilder();
 
     genPrintfDeclration(mod);
+    genTestFunction(mod);
 
     map<FuncGenrator> funcGenrators = mapFuncsToNameAndGenrator(mod, builder, funcs);
 
@@ -103,6 +105,12 @@ function genPrintfDeclration(llvm:LLVMModuleRef mod) {
     llvm:LLVMTypeRef[] pointer_to_char_type = [llvm:llvmPointerType(llvm:llvmInt8Type(), 0)];
     llvm:LLVMTypeRef printfType = llvm:llvmFunctionType1(llvm:llvmInt32Type(), pointer_to_char_type, 1, 1);
     printfRef = llvm:llvmAddFunction(mod, "printf", printfType);
+}
+
+function genTestFunction(llvm:LLVMModuleRef mod) {
+    llvm:LLVMTypeRef[] intType = [llvm:llvmInt64Type()];
+    llvm:LLVMTypeRef printfType = llvm:llvmFunctionType1(llvm:llvmVoidType(), intType, 1, 0);
+    testFuncRef = llvm:llvmAddFunction(mod, "testFunc", printfType);
 }
 
 function mapFuncsToNameAndGenrator(llvm:LLVMModuleRef mod, llvm:LLVMBuilderRef builder, bir:Function?[] funcs)
