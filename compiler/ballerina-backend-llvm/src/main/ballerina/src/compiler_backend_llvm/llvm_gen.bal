@@ -317,8 +317,7 @@ function getTypeStringName(bir:BType typeValue) returns string {
 
 function createTypePointerForTaggedStructType(string taggedType, llvm:LLVMBuilderRef builder) {
     llvm:LLVMTypeRef taggedUnionType = getTaggedStructType(taggedType);
-    llvm:LLVMValueRef tempStructAllocation = llvm:llvmBuildAlloca(builder, taggedUnionType, ("tempStructOf"+taggedType));
-    llvm:LLVMTypeRef typePointerToTaggedUnion = llvm:llvmTypeOf(tempStructAllocation);
+    llvm:LLVMTypeRef typePointerToTaggedUnion = llvm:llvmPointerType(taggedUnionType, 0);
     taggedTypeToTypePointerMap[taggedType] = typePointerToTaggedUnion;
 }
 
