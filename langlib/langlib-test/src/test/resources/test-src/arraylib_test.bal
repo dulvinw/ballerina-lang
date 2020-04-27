@@ -513,6 +513,25 @@ function testInvalidPushOnUnionOfSameBasicType() {
     assertValueEquality("incompatible types: expected 'int', found 'string'", err.detail()?.message);
 }
 
+function testShiftOperation() {
+    testShiftOnTupleWithoutValuesForRestParameter();
+}
+
+function testShiftOnTupleWithoutValuesForRestParameter() {
+    [int, int...] intTupleWithRest = [0];
+
+    var fn = function () {
+        var x = intTupleWithRest.shift();
+    };
+
+    error? res = trap fn();
+    assertTrue(res is error);
+
+    error err = <error> res;
+    assertValueEquality("{ballerina/lang.array}OperationNotSupported", err.reason());
+    assertValueEquality("shift() not supported on type 'null'", err.detail()?.message);
+}
+
 const ASSERTION_ERROR_REASON = "AssertionError";
 
 function assertTrue(any|error actual) {
@@ -540,4 +559,31 @@ function assertValueEquality(anydata|error expected, anydata|error actual) {
 
     panic error(ASSERTION_ERROR_REASON,
                 message = "expected '" + expected.toString() + "', found '" + actual.toString () + "'");
+}
+
+
+function testAsyncFpArgsWithArrays() returns [int, int[]] {
+    int[] numbers = [-7, 2, -12, 4, 1];
+    int count = 0;
+    int[] filter = numbers.filter(function (int i) returns boolean {
+        future<int> f1 = start getRandomNumber(i);
+        int a = wait f1;
+        return a >= 0;
+    });
+    filter.forEach(function (int i) {
+        future<int> f1 = start getRandomNumber(i);
+        int a = wait f1;
+        filter[count] = i + 2;
+        count = count + 1;
+    });
+    int reduce = filter.reduce(function (int total, int i) returns int {
+        future<int> f1 = start getRandomNumber(i);
+        int a = wait f1;
+        return total + a;
+    }, 0);
+    return [reduce, filter];
+}
+
+function getRandomNumber(int i) returns int {
+    return i + 2;
 }
