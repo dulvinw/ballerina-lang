@@ -17,7 +17,7 @@
  */
 package org.wso2.ballerinalang.compiler.bir;
 
-import org.wso2.ballerinalang.compiler.bir.codegen.CodeGenerator;
+import org.wso2.ballerinalang.compiler.bir.codegen.jvmcodegen.JvmCodeGenerator;
 import org.wso2.ballerinalang.compiler.bir.emit.BIREmitter;
 import org.wso2.ballerinalang.compiler.bir.model.BIRNode;
 import org.wso2.ballerinalang.compiler.util.CompilerContext;
@@ -35,7 +35,7 @@ public class BackendDriver {
 
     private static final CompilerContext.Key<BackendDriver> BACKEND_DRIVER = new CompilerContext.Key<>();
 
-    private CodeGenerator codeGenerator;
+    private JvmCodeGenerator codeGenerator;
     private BIREmitter birEmitter;
 
     public static BackendDriver getInstance(CompilerContext context) {
@@ -49,7 +49,7 @@ public class BackendDriver {
     private BackendDriver(CompilerContext context) {
         context.put(BACKEND_DRIVER, this);
 
-        this.codeGenerator = CodeGenerator.getInstance(context);
+        this.codeGenerator = JvmCodeGenerator.getInstance(context);
         this.birEmitter = BIREmitter.getInstance(context);
     }
 

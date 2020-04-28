@@ -36,7 +36,7 @@ class TestEvent {
         VARIAVLE_ANN("variable"),
         ANNOTATION_ANN("annotation"),
         TRANSFORM_ANN("transformer"),
-        CODE_GEN("codegen");
+        CODE_GEN("jvmcodegen");
 
         String name;
 

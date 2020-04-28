@@ -81,7 +81,7 @@ class AttributeMapValueImpl extends MapValueImpl<String, String> {
         XMLValidator.validateXMLName(localName);
         XMLValidator.validateXMLName(prefix);
 
-        // JVM codegen uses prefix == 'xmlns' and namespaceUri == null to denote namespace decl at runtime.
+        // JVM jvmcodegen uses prefix == 'xmlns' and namespaceUri == null to denote namespace decl at runtime.
         // 'localName' will contain the namespace name where as 'value' will contain the namespace URI
         // todo: Fix this so that namespaceURI points to XMLConstants.XMLNS_ATTRIBUTE_NS_URI
         //  and remove this special case

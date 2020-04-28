@@ -44,7 +44,7 @@ import static org.bytedeco.llvm.global.LLVM.LLVMTargetMachineEmitToFile;
                 @Argument(name = "t", type = RECORD, structType = "LLVMTargetMachineRef"),
                 @Argument(name = "m", type = RECORD, structType = "LLVMModuleRef"),
                 @Argument(name = "filename", type = ARRAY, elementType = BYTE),
-                @Argument(name = "codegen", type = INT),
+                @Argument(name = "jvmcodegen", type = INT),
                 @Argument(name = "errorMessage", type = RECORD, structType = "PointerPointer"),
         },
         returnType = {

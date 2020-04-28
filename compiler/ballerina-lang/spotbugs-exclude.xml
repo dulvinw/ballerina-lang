@@ -23,10 +23,10 @@
         <Package name="org.wso2.ballerinalang.compiler.codegen" />
     </Match>
     <Match>
-        <Package name="org.wso2.ballerinalang.compiler.bir.codegen" />
+        <Package name="org.wso2.ballerinalang.compiler.bir.codegen.jvmcodegen" />
     </Match>
     <Match>
-        <Package name="org.wso2.ballerinalang.compiler.bir.codegen.interop" />
+        <Package name="org.wso2.ballerinalang.compiler.bir.codegen.jvmcodegen.interop" />
     </Match>
     <Match>
         <Package name="org.wso2.ballerinalang.compiler.bir.emit" />

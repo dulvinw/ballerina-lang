@@ -55,7 +55,7 @@ public class BLangInvocation extends BLangAccessExpression implements Invocation
     public List<BLangAnnotationAttachment> annAttachments = new ArrayList<>();
 
     /*
-     * Below expressions are used by typechecker, desugar and codegen phases.
+     * Below expressions are used by typechecker, desugar and jvmcodegen phases.
      * Above phases must rely on below expr lists, rather than {@link #argExprs}
      */
     public List<BLangExpression> requiredArgs = new ArrayList<>();

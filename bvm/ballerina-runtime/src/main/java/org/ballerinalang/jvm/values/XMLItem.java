@@ -305,7 +305,7 @@ public final class XMLItem extends XMLValue {
     /**
      * @param seq children to add to this element.
      *
-     * addChildren is only used for constructing xml tree from xml literals, and only usage is to directly codegen
+     * addChildren is only used for constructing xml tree from xml literals, and only usage is to directly jvmcodegen
      * the adding children.
      *
      * @deprecated

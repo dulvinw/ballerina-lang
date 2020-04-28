@@ -1545,7 +1545,7 @@ public class TypeChecker extends BLangNodeVisitor {
 
         detailType.restFieldType = errorRefRestFieldType;
 
-        // TODO : Remove this. Had to add this due to BIR codegen requires this.
+        // TODO : Remove this. Had to add this due to BIR jvmcodegen requires this.
         BInvokableType invokableType = new BInvokableType(new ArrayList<>(), symTable.nilType, null);
         BInvokableSymbol initSymbol = Symbols.createFunctionSymbol(0, Names.INIT_FUNCTION_SUFFIX, packageID,
                 invokableType, detailSymbol, false);

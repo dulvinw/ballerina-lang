@@ -31,7 +31,7 @@ import static org.ballerinalang.jvm.util.BLangConstants.ORG_NAME_SEPARATOR;
 import static org.ballerinalang.jvm.util.BLangConstants.VERSION_SEPARATOR;
 
 /**
- * A {@code ValueCreator} is an API that will be implemented by all the module init classed from jvm codegen.
+ * A {@code ValueCreator} is an API that will be implemented by all the module init classed from jvm jvmcodegen.
  * This provides facility for creating runtime record, object, error values.
  *
  * @since 0.995.0
