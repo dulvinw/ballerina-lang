@@ -79,8 +79,11 @@ public class NativePackageGen {
         genFunctions();
     }
 
+    /**
+     * Generate the functions for this BIRPackage.
+     */
     private void genFunctions() {
-        this.nativeFunctionBuilder.
+        this.nativeFunctionBuilder.genFunctions();
     }
 
 }
