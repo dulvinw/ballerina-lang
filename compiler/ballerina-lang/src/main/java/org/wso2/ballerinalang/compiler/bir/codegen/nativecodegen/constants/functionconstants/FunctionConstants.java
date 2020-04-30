@@ -19,5 +19,11 @@ package org.wso2.ballerinalang.compiler.bir.codegen.nativecodegen.constants.func
 
 public class FunctionConstants {
 
-    public static final String PRINT = "print";
+    public static final String PRINT = "printf";
+
+    public static final String NEW_INT_ARRAY = "new_int_array";
+
+    public static final String INT_ARRAY_STORE = "int_array_store";
+
+    public static final String INT_ARRAY_LOAD = "int_array_load";
 }
