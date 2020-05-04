@@ -26,4 +26,6 @@ public class FunctionConstants {
     public static final String INT_ARRAY_STORE = "int_array_store";
 
     public static final String INT_ARRAY_LOAD = "int_array_load";
+
+    public static final String VAR_ALLOC = "val_alloc";
 }

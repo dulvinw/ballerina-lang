@@ -25,7 +25,7 @@ import java.nio.file.Path;
 
 import static org.bytedeco.llvm.global.LLVM.LLVMCreateBuilder;
 import static org.bytedeco.llvm.global.LLVM.LLVMModuleCreateWithName;
-import static org.wso2.ballerinalang.compiler.bir.codegen.utils.CodeGenUtils.getPackageNameFromString;
+import static org.wso2.ballerinalang.compiler.bir.codegen.nativecodegen.utils.Utils.getPackageNameFromString;
 
 /**
  * Generate native objects using the BIR Package.

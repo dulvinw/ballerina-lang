@@ -15,13 +15,14 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.wso2.ballerinalang.compiler.bir.codegen.utils;
+package org.wso2.ballerinalang.compiler.bir.codegen.nativecodegen.utils;
 
+import org.wso2.ballerinalang.compiler.bir.model.BIRNode;
 import org.wso2.ballerinalang.compiler.util.Name;
 
 import static org.wso2.ballerinalang.compiler.bir.codegen.jvmcodegen.JvmConstants.FILE_NAME_PERIOD_SEPERATOR;
 
-public class CodeGenUtils {
+public class Utils {
 
     public static String getPackageName(Name orgName, Name moduleName) {
 
@@ -62,4 +63,21 @@ public class CodeGenUtils {
         }
     }
 
+    public static String localVariableNameWithPrefix(BIRNode.BIRVariableDcl localVar) {
+        String localVarName = localVariableName(localVar);
+        return addPrefixToLocalVarName(localVarName);
+    }
+
+    private static String addPrefixToLocalVarName(String localVarName) {
+        return "local" + localVarName;
+    }
+
+    public static String localVariableName(BIRNode.BIRVariableDcl localVar) throws RuntimeException {
+        String name = localVar.name.value;
+        if (name != null) {
+            return name.substring(1);
+        }
+
+        throw new RuntimeException("Local Variable either doesn't have a name or is not string");
+    }
 }

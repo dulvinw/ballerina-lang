@@ -117,11 +117,11 @@ import static org.wso2.ballerinalang.compiler.bir.codegen.jvmcodegen.JvmValueGen
 import static org.wso2.ballerinalang.compiler.bir.codegen.jvmcodegen.interop.ExternalMethodGen.createExternalFunctionWrapper;
 import static org.wso2.ballerinalang.compiler.bir.codegen.jvmcodegen.interop.ExternalMethodGen.injectDefaultParamInits;
 import static org.wso2.ballerinalang.compiler.bir.codegen.jvmcodegen.interop.ExternalMethodGen.isBallerinaBuiltinModule;
-import static org.wso2.ballerinalang.compiler.bir.codegen.utils.CodeGenUtils.cleanupName;
-import static org.wso2.ballerinalang.compiler.bir.codegen.utils.CodeGenUtils.cleanupPackageName;
-import static org.wso2.ballerinalang.compiler.bir.codegen.utils.CodeGenUtils.cleanupSourceFileName;
-import static org.wso2.ballerinalang.compiler.bir.codegen.utils.CodeGenUtils.getPackageName;
-import static org.wso2.ballerinalang.compiler.bir.codegen.utils.CodeGenUtils.getPackageNameFromString;
+import static org.wso2.ballerinalang.compiler.bir.codegen.nativecodegen.utils.Utils.cleanupName;
+import static org.wso2.ballerinalang.compiler.bir.codegen.nativecodegen.utils.Utils.cleanupPackageName;
+import static org.wso2.ballerinalang.compiler.bir.codegen.nativecodegen.utils.Utils.cleanupSourceFileName;
+import static org.wso2.ballerinalang.compiler.bir.codegen.nativecodegen.utils.Utils.getPackageName;
+import static org.wso2.ballerinalang.compiler.bir.codegen.nativecodegen.utils.Utils.getPackageNameFromString;
 
 /**
  * BIR module to JVM byte code generation class.
