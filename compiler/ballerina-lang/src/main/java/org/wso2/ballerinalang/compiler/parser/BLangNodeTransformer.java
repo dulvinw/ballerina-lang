@@ -48,6 +48,7 @@ import io.ballerinalang.compiler.syntax.tree.ForEachStatementNode;
 import io.ballerinalang.compiler.syntax.tree.ForkStatementNode;
 import io.ballerinalang.compiler.syntax.tree.FunctionArgumentNode;
 import io.ballerinalang.compiler.syntax.tree.FunctionBodyBlockNode;
+import io.ballerinalang.compiler.syntax.tree.FunctionBodyNode;
 import io.ballerinalang.compiler.syntax.tree.FunctionCallExpressionNode;
 import io.ballerinalang.compiler.syntax.tree.FunctionDefinitionNode;
 import io.ballerinalang.compiler.syntax.tree.FunctionSignatureNode;
@@ -68,7 +69,9 @@ import io.ballerinalang.compiler.syntax.tree.ListConstructorExpressionNode;
 import io.ballerinalang.compiler.syntax.tree.ListenerDeclarationNode;
 import io.ballerinalang.compiler.syntax.tree.MappingConstructorExpressionNode;
 import io.ballerinalang.compiler.syntax.tree.MappingFieldNode;
+import io.ballerinalang.compiler.syntax.tree.MetadataNode;
 import io.ballerinalang.compiler.syntax.tree.MethodCallExpressionNode;
+import io.ballerinalang.compiler.syntax.tree.MethodDeclarationNode;
 import io.ballerinalang.compiler.syntax.tree.ModuleMemberDeclarationNode;
 import io.ballerinalang.compiler.syntax.tree.ModulePartNode;
 import io.ballerinalang.compiler.syntax.tree.ModuleVariableDeclarationNode;
@@ -403,6 +406,13 @@ public class BLangNodeTransformer extends NodeTransformer<BLangNode> {
 
         return importDcl;
     }
+
+//    @Override
+//    public BLangNode transform(MethodDeclarationNode methodDeclarationNode) {
+//        return createFunction(methodDeclarationNode.methodName(), null, methodDeclarationNode.visibilityQualifier(),
+//                methodDeclarationNode.methodSignature(), methodDeclarationNode.metadata(),
+//                getPosition(methodDeclarationNode));
+//    }
 
     public BLangNode transform(ConstantDeclarationNode constantDeclarationNode) {
         BLangConstant constantNode = (BLangConstant) TreeBuilder.createConstantNode();
@@ -845,14 +855,20 @@ public class BLangNodeTransformer extends NodeTransformer<BLangNode> {
 
     @Override
     public BLangNode transform(FunctionDefinitionNode funcDefNode) {
+        return createFunction(funcDefNode.functionName(), funcDefNode.functionBody(), funcDefNode.visibilityQualifier(),
+                funcDefNode.functionSignature(), funcDefNode.metadata(), getPosition(funcDefNode));
+    }
+
+    private BLangFunction createFunction(IdentifierToken functionName, FunctionBodyNode body,
+            Optional<Token> visibilityQualifier, FunctionSignatureNode signatureNode, MetadataNode metadata,
+            DiagnosticPos pos) {
         BLangFunction bLFunction = (BLangFunction) TreeBuilder.createFunctionNode();
 
         // Set function name
-        IdentifierToken funcName = funcDefNode.functionName();
-        bLFunction.name = createIdentifier(getPosition(funcName), funcName.text());
+        bLFunction.name = createIdentifier(getPosition(functionName), functionName.text());
 
         // Set the visibility qualifier
-        funcDefNode.visibilityQualifier().ifPresent(visibilityQual -> {
+        visibilityQualifier.ifPresent(visibilityQual -> {
             if (visibilityQual.kind() == SyntaxKind.PUBLIC_KEYWORD) {
                 bLFunction.flagSet.add(Flag.PUBLIC);
             } else if (visibilityQual.kind() == SyntaxKind.PRIVATE_KEYWORD) {
@@ -865,22 +881,21 @@ public class BLangNodeTransformer extends NodeTransformer<BLangNode> {
         });
 
         // Set function signature
-        populateFuncSignature(bLFunction, funcDefNode.functionSignature());
+        populateFuncSignature(bLFunction, signatureNode);
 
         // Set the function body
-        if (funcDefNode.functionBody() == null) {
+        if (body == null) {
             bLFunction.body = null;
             bLFunction.flagSet.add(Flag.INTERFACE);
             bLFunction.interfaceFunction = true;
         } else {
-            bLFunction.body = (BLangFunctionBody) funcDefNode.functionBody().apply(this);
+            bLFunction.body = (BLangFunctionBody) body.apply(this);
             if (bLFunction.body.getKind() == NodeKind.EXTERN_FUNCTION_BODY) {
                 bLFunction.flagSet.add(Flag.NATIVE);
             }
         }
-
-        bLFunction.annAttachments = applyAll(funcDefNode.metadata().annotations());
-        bLFunction.pos = getPosition(funcDefNode);
+        bLFunction.annAttachments = applyAll(metadata.annotations());
+        bLFunction.pos = pos;
         return bLFunction;
     }
 
