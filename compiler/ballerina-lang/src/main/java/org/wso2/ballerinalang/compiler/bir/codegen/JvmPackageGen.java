@@ -142,7 +142,8 @@ public class JvmPackageGen {
     private Map<String, PackageID> dependentModules;
     private BLangDiagnosticLogHelper dlog;
 
-    JvmPackageGen(SymbolTable symbolTable, PackageCache packageCache, BLangDiagnosticLogHelper dlog) {
+    JvmPackageGen(SymbolTable symbolTable, PackageCache packageCache, BLangDiagnosticLogHelper dlog,
+            BPackageSymbol symbol) {
 
         birFunctionMap = new HashMap<>();
         globalVarClassMap = new HashMap<>();
@@ -151,7 +152,7 @@ public class JvmPackageGen {
         this.symbolTable = symbolTable;
         this.packageCache = packageCache;
         this.dlog = dlog;
-        jvmMethodGen = new JvmMethodGen(this);
+        jvmMethodGen = new JvmMethodGen(this, symbol.sLineToLocalVar);
         typeBuilder = new ResolvedTypeBuilder();
 
         JvmCastGen.symbolTable = symbolTable;

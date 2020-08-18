@@ -171,9 +171,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -219,6 +222,12 @@ public class BIRGen extends BLangNodeVisitor {
     private static final String MOCK_FN_DELIMITER = "~";
 
     private ResolvedTypeBuilder typeBuilder = new ResolvedTypeBuilder();
+
+    // Store the variables which are not defined yet for debugger support
+    private Set<BIRVariableDcl> declaredVariables = new HashSet<>();
+
+    // Store the line number where variables are defined, for debugging support
+    private Map<Integer, List<BIRVariableDcl>> sLineToVarMap = new HashMap<>();
 
     public static BIRGen getInstance(CompilerContext context) {
         BIRGen birGen = context.get(BIR_GEN);
@@ -271,6 +280,8 @@ public class BIRGen extends BLangNodeVisitor {
                 }
             });
         }
+
+        astPkg.symbol.sLineToLocalVar = this.sLineToVarMap;
 
         setEntryPoints(astPkg);
         return astPkg;
@@ -959,7 +970,15 @@ public class BIRGen extends BLangNodeVisitor {
         this.env.symbolVarMap.put(astVarDefStmt.var.symbol, birVarDcl);
 
         if (astVarDefStmt.var.expr == null) {
+            this.declaredVariables.add(birVarDcl);
             return;
+        }
+
+        // Store the current location as variable defined line, for debugging support.
+        if (astVarDefStmt.pos != null) {
+            List<BIRVariableDcl> variablesForLine = this.sLineToVarMap
+                    .computeIfAbsent(astVarDefStmt.pos.sLine, s -> new LinkedList<>());
+            variablesForLine.add(birVarDcl);
         }
 
         // Visit the rhs expression.
@@ -1667,7 +1686,9 @@ public class BIRGen extends BLangNodeVisitor {
 
         if (variableStore) {
             if (astVarRefExpr.symbol.name != Names.IGNORE) {
-                BIROperand varRef = new BIROperand(this.env.symbolVarMap.get(varSymbol));
+                BIRVariableDcl varDcl = this.env.symbolVarMap.get(varSymbol);
+                setLineNumberForVarDefinition(astVarRefExpr, varDcl);
+                BIROperand varRef = new BIROperand(varDcl);
                 emit(new Move(astVarRefExpr.pos, this.env.targetOperand, varRef));
             }
         } else {
@@ -1688,6 +1709,18 @@ public class BIRGen extends BLangNodeVisitor {
             this.env.targetOperand = tempVarRef;
         }
         this.varAssignment = variableStore;
+    }
+
+    /*
+     * Storing line number for variable definition for debugging purpose.
+     */
+    private void setLineNumberForVarDefinition(BLangLocalVarRef astVarRefExpr, BIRVariableDcl varDcl) {
+        if (this.declaredVariables.contains(varDcl) && astVarRefExpr.pos != null) {
+            this.declaredVariables.remove(varDcl);
+            List<BIRVariableDcl> variablesForLine = this.sLineToVarMap
+                    .computeIfAbsent(astVarRefExpr.pos.sLine, s -> new LinkedList<>());
+            variablesForLine.add(varDcl);
+        }
     }
 
     private boolean isSelfVar(BSymbol symbol) {

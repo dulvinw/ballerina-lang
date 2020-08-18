@@ -239,12 +239,14 @@ public class JvmMethodGen {
     private JvmPackageGen jvmPackageGen;
     private SymbolTable symbolTable;
     private BUnionType errorOrNilType;
+    private Map<Integer, List<BIRVariableDcl>> sLineToVarDcl;
 
-    JvmMethodGen(JvmPackageGen jvmPackageGen) {
+    JvmMethodGen(JvmPackageGen jvmPackageGen, Map<Integer, List<BIRVariableDcl>> sLineToVarDcl) {
 
         this.jvmPackageGen = jvmPackageGen;
         this.symbolTable = jvmPackageGen.symbolTable;
         this.errorOrNilType = BUnionType.create(null, symbolTable.errorType, symbolTable.nilType);
+        this.sLineToVarDcl = sLineToVarDcl;
     }
 
     private static int[] toIntArray(List<Integer> states) {
@@ -1458,9 +1460,13 @@ public class JvmMethodGen {
     }
 
     private static void generateDiagnosticPos(DiagnosticPos pos, MethodVisitor mv) {
+        Label label = new Label();
+        generateDiagnosticPos(pos, mv, label);
+    }
+
+    private static void generateDiagnosticPos(DiagnosticPos pos, MethodVisitor mv, Label label) {
 
         if (pos != null && pos.sLine != 0x80000000) {
-            Label label = new Label();
             mv.visitLabel(label);
             mv.visitLineNumber(pos.sLine, label);
         }
@@ -1875,8 +1881,8 @@ public class JvmMethodGen {
                 // local vars have visible range information
                 if (localVar.kind == VarKind.LOCAL) {
                     int insOffset = localVar.insOffset;
-                    if (localVar.startBB != null) {
-                        startLabel = labelGen.getLabel(funcName + localVar.startBB.id.value + "ins" + insOffset);
+                    if (localVar.startBB != null && localVar.pos != null) {
+                        startLabel = labelGen.getLabel(funcName + "line_no" + localVar.pos.sLine);
                     }
                     if (localVar.endBB != null) {
                         endLabel = labelGen.getLabel(funcName + localVar.endBB.id.value + "beforeTerm");
@@ -1943,7 +1949,7 @@ public class JvmMethodGen {
                     continue;
                 } else {
                     insKind = inst.getKind();
-                    generateDiagnosticPos(((BIRNode) inst).pos, mv);
+                    generateLabelsForInstructionBeginings(funcName, inst, mv, labelGen);
                 }
 
                 generateInstructions(instGen, localVarOffset, asyncDataCollector, insKind, inst);
@@ -1987,6 +1993,30 @@ public class JvmMethodGen {
             }
             j += 1;
         }
+    }
+
+    private void generateLabelsForInstructionBeginings(String funcName, BIRInstruction inst, MethodVisitor mv,
+            LabelGenerator labelGen) {
+
+        DiagnosticPos pos = ((BIRNode) inst).pos;
+        if (pos == null || !this.sLineToVarDcl.containsKey(pos.sLine)) {
+            generateDiagnosticPos(pos, mv);
+            return;
+        }
+
+        Label label = null;
+        List<BIRVariableDcl> lineToInstantiatedVariables = this.sLineToVarDcl.get(pos.sLine);
+        for (BIRVariableDcl varDcl : lineToInstantiatedVariables) {
+            String labelName = funcName + "line_no" + varDcl.pos.sLine;
+            if (label == null) {
+                label = labelGen.getLabel(labelName);
+                generateDiagnosticPos(pos, mv, label);
+                continue;
+            }
+
+            labelGen.putLable(labelName, label);
+        }
+        this.sLineToVarDcl.remove(pos.sLine);
     }
 
     private void generateInstructions(JvmInstructionGen instGen, int localVarOffset,

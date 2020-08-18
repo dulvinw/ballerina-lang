@@ -17,6 +17,7 @@
 */
 package org.wso2.ballerinalang.compiler.semantics.model.symbols;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.ballerinalang.model.elements.PackageID;
 import org.ballerinalang.model.symbols.SymbolKind;
 import org.ballerinalang.repository.CompiledPackage;
@@ -28,7 +29,9 @@ import org.wso2.ballerinalang.programfile.CompiledBinaryFile.BIRPackageFile;
 import org.wso2.ballerinalang.programfile.CompiledBinaryFile.PackageFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.wso2.ballerinalang.compiler.semantics.model.symbols.SymTag.PACKAGE;
@@ -56,14 +59,19 @@ public class BPackageSymbol extends BTypeSymbol {
     // TODO Refactor following two flags
     public boolean entryPointExists = false;
 
+    // Used to store the variable definition line number for debugging purposes.
+    public Map<Integer, List<BIRNode.BIRVariableDcl>> sLineToLocalVar;
+
     public BPackageSymbol(PackageID pkgID, BSymbol owner) {
         super(PACKAGE, 0, pkgID.name, pkgID, null, owner);
         this.type = new BPackageType(this);
+        this.sLineToLocalVar = new HashMap<>();
     }
 
     public BPackageSymbol(PackageID pkgID, BSymbol owner, int flags) {
         this(pkgID, owner);
         this.flags = flags;
+        this.sLineToLocalVar = new HashMap<>();
     }
 
     @Override
